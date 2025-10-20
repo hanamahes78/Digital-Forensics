@@ -17,36 +17,36 @@ The forensic image was downloaded from the source https://archive.org/download/c
 
 2. **Image Mounting**<br>
 The downloaded forensic image was opened in FTK Imager to enable examination of its contents.<br>
-<img width="600" alt="Process-2a" src="">
-<img width="600" alt="Process-2b" src="">
+<img width="400" alt="Process-2a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-1.png"><br>
+<img width="500" alt="Process-2b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-2.png"><br>
 
 3. **Directory Inspection**<br>
 The system directory was located within the root Logical Volume (LVM), particularly `/var/www/html`, `/etc`, `/home`, and `/var/log`, were reviewed to identify web applications and relevant files.<br>
-<img width="600" alt="Process-3a" src="">
-<img width="600" alt="Process-3b" src="">
+<img width="300" alt="Process-3a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-3.png"><br>
+<img width="200" alt="Process-3b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-4.png"><br>
 
 4. **Login Log Analysis**<br>
 To begin the analysis, the log files located in the `/var/log` directory were examined. The relevant log files for login investigation include `wtmp`, `btmp`, `auth.log`, and `lastlog`, as these files record user authentication events.
 
    The `last` command was used to display the user login history.<br>
-   <img width="600" alt="Process-4a" src="">
-   <img width="600" alt="Process-4b" src=""><br>
-   <img width="600" alt="Process-4c" src=""><br>
-   <img width="600" alt="Process-4d" src="">
+   <img width="150" alt="Process-4a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-5.png">
+   <img width="600" alt="Process-4b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-6.png"><br>
+   <img width="700" alt="Process-4c" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-7.png"><br>
+   <img width="700" alt="Process-4d" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-8.png"><br>
 
    The `btmp` file records only failed login attempts. The `wtmp` file records all login sessions and is the default log accessed by the last command.
 
    From these logs, numerous failed login attempts were observed originating from the IP address `192.168.210.131`. Additionally, the user "**mail**" was found to have successfully logged in from the same IP address four times.
    
    To validate these findings, the `auth.log` file was analyzed. This log provides more detailed information regarding authentication attempts, the use of sudo, and other login-related events.<br>
-   <img width="600" alt="Process-4e" src=""><br>
+   <img width="800" alt="Process-4e" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-9.png"><br>
 
    Searching within `auth.log` for the IP address and username "**mail**" revealed multiple suspicious activities. Numerous failed login attempts targeting the root account were recorded, indicating a brute-force attack. Approximately one hour after the brute-force attempts, a new user named "**php**" was created and added to the sudo group, while the user "**mail**" was assigned a login shell, a password, and also added to the sudo group.
    
    These findings indicate that the attacker eventually discovered an alternative method to gain access to the system after the brute-force attack failed.
    
    The `lastlog` file, which displays the most recent login for each user and the originating host, was also examined. Although the file appeared to be corrupted, partial information was successfully retrieved using the `strings` command. The same IP address `192.168.210.131` found in `wtmp`, `btmp`, and `auth.log` was also present here, further confirm the intrusion source.<br>
-   <img width="600" alt="Process-4f" src=""><br>
+   <img width="500" alt="Process-4f" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-10.png"><br>
 
 5. **User and Group Analysis**<br>
 To collect information about system users and their associated groups, three files in the `/etc` directory were examined:
@@ -57,15 +57,15 @@ To collect information about system users and their associated groups, three fil
    Two suspicious users were identified, "**mail**" and "**php**". From the `passwd` file, it was observed that both accounts used **bash** as their login shell and each had a corresponding home directory.
    
    Using the `grep` command on the `shadow` and `group` files confirmed that both users had password entries and were members of the **sudo** group, granting them administrative privileges.<br>
-   <img width="600" alt="Process-5a" src=""><br>
-   <img width="600" alt="Process-5b" src=""><br>
+   <img width="700" alt="Process-5a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-11.png"><br>
+   <img width="800" alt="Process-5b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-12.png"><br>
 
    Further examination of user directories revealed that the home directory of "**php**" contained only default files created during user account initialization. In contrast, the "**mail**" user directory contained a `.bash_history` file, which records all commands executed in the bash shell.<br>
-   <img width="600" alt="Process-5c" src=""><br>
-   <img width="600" alt="Process-5d" src=""><br>
+   <img width="700" alt="Process-5c" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-13.png"><br>
+   <img width="700" alt="Process-5d" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-14.png"><br>
 
    Analysis of the `.bash_history` file showed that the "**mail**" user frequently executed the command `sudo su -` to elevate privileges to root.<br>
-   <img width="600" alt="Process-5e" src=""><br>
+   <img width="700" alt="Process-5e" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-15.png"><br>
 
    Examination of the root user’s `.bash_history` confirmed that the `lastlog` file had been modified and referenced two additional suspicious files requiring further investigation:
    - `update.php`
@@ -74,18 +74,18 @@ To collect information about system users and their associated groups, three fil
 ## Findings
 1. **How Attacker Gain Access to System**<br>
 Log analysis indicates that the attacker did not gain initial access via successful brute-force authentication. Given that the compromised host was a web server, the investigation focused on the deployed web application and its possible vulnerabilities. Inspection of `/var/www/html` revealed a Drupal installation.<br>
-<img width="600" alt="Finding-1a" src=""><br>
-<img width="600" alt="Finding-1b" src=""><br>
+<img width="700" alt="Finding-1a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-16.png"><br>
+<img width="700" alt="Finding-1b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-17.png"><br>
    The Drupal version was identified in `./jabc/includes/bootstrap.inc` as **Drupal 7.26**, which is known to be vulnerable to **CVE-2014-3704**.<br>
-   <img width="600" alt="Finding-1c" src=""><br>
+   <img width="800" alt="Finding-1c" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-18.png"><br>
    This vulnerability can be exploited via specially crafted `POST` requests.
 
    Apache access logs were filtered for POST requests in the relevant time window.<br>
-   <img width="600" alt="Finding-1d" src=""><br>
-   <img width="600" alt="Finding-1e" src=""><br>
+   <img width="700" alt="Finding-1d" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-19.png"><br>
+   <img width="800" alt="Finding-1e" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-20.png"><br>
    Three suspicious POST requests originating from `192.168.210.131` were identified. <br>
-   <img width="600" alt="Finding-1f" src=""><br>
-   <img width="600" alt="Finding-1g" src=""><br>
+   <img width="700" alt="Finding-1f" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-21.png"><br>
+   <img width="700" alt="Finding-1g" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-22.png"><br>
    Further analysis of uploaded content and webroot files revealed a web shell script. The web shell provided remote command execution capability and was used to establish a reverse connection to the attacker host (192.168.210.131).
 
    In conclusion initial access was achieved by exploiting a remote code execution/SQL injection vulnerability in Drupal 7.26, which allowed the attacker to upload and execute a web shell and gain remote control of the server.
@@ -135,13 +135,12 @@ Extract and preserve the following artifacts for detailed analysis and reporting
 
 7. **Timeline Construction with log2timeline Plaso**<br>
 Create a chronological timeline by ingesting relevant logs and file system metadata into log2timeline. Correlate web server access events, POST request timestamps, account creation events, sudo usage, file creation or modification times, and cron edits to reconstruct the attack lifecycle.<br>
-<img width="600" alt="Finding-7a" src=""><br>
-<img width="600" alt="Finding-7b" src=""><br>
-<img width="600" alt="Finding-7c" src="">
+<img width="800" alt="Finding-7a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-23.png"><br>
+<img width="800" alt="Finding-7b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-24.png"><br>
+<img width="800" alt="Finding-7c" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R5-25.png"><br>
 
 8. **Reporting with Autopsy**<br>
-Generate a formal forensic report via Autopsy (`Tools → Generate Report`) that includes objectives, methodology, extracted artifacts and their hashes, event timeline, IOCs, impact assessment, and remediation recommendations.
-
+Generate a formal forensic report via Autopsy (`Tools → Generate Report`) that includes objectives, methodology, extracted artifacts and their hashes, event timeline, IOCs, impact assessment, and remediation recommendations.<br>
    [File Report](https://drive.google.com/drive/folders/1ZYnpp7PjfPqeNI_ECxjK-6YJBQJsYAKE)
 
 ## Conclusion
@@ -151,4 +150,5 @@ The system can be remediated by:
 - Removing all backdoors, web shells, and unauthorized users.
 - Restoring modified configuration and log files from trusted backups.
 - Patching the exploited vulnerability and applying the latest security updates.
+
 - Conducting a full malware scan and rebuilding the system if root compromise is confirmed.
