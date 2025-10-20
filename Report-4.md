@@ -38,32 +38,32 @@ The extracted files will go through static and behavioral analysis to determine 
 
 ## Findings
 1. **Victim’s IP Address**<br>
-<img width="600" alt="Findings-1" src=""><br>
+<img width="800" alt="Findings-1" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-1.png"><br>
 The infected host was identified with the IP address `10.0.0.149`.
 
 2. **Victim’s Port Number**<br>
-<img width="600" alt="Findings-2a" src=""><br>
-<img width="600" alt="Findings-2b" src=""><br>
+<img width="800" alt="Findings-2a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-2.png"><br>
+<img width="500" alt="Findings-2b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-3.png"><br>
 The local port associated with the suspicious communication was `49668`.
 
 3. **Domain Name**<br>
-<img width="600" alt="Findings-3a" src=""><br>
-<img width="600" alt="Findings-3b" src=""><br>
+<img width="800" alt="Findings-3a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-4.png"><br>
+<img width="500" alt="Findings-3b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-5.png"><br>
 By following the TCP stream of suspicious packets, the external domain or host involved in communication was identified as `128.254.207.55`.
 
 4. **URL Associated with the Infection**<br>
-<img width="600" alt="Findings-4" src=""><br>
+<img width="800" alt="Findings-4" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-6.png"><br>
 The infection activity involved an HTTP request to the following URL `http[:]//128.254.207.55/86607[.]dat`.
 
 5. **Information on the Extracted Malicious File**<br>
-<img width="600" alt="Findings-5a" src=""><br>
-<img width="600" alt="Findings-5b" src=""><br>
+<img width="800" alt="Findings-5a" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-7.png"><br>
+<img width="700" alt="Findings-5b" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-8.png"><br>
 The suspicious file was identified by following the HTTP stream corresponding to the infection-related traffic.
 Using Wireshark’s `Export Objects → HTTP`, the file named `86607.dat` was extracted for further examination.<br>
-   <img width="600" alt="Findings-5c" src=""><br>
-   <img width="600" alt="Findings-5d" src=""><br>
+   <img width="800" alt="Findings-5c" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-9.png"><br>
+   <img width="800" alt="Findings-5d" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-10.png"><br>
    Analysis conducted via VirusTotal determined that 86607.dat was classified as a `Trojan and spyware threat`.<br>
-   <img width="600" alt="Findings-5e" src=""><br>
+   <img width="800" alt="Findings-5e" src="https://github.com/hanamahes78/Digital-Forensics/blob/main/img/R4-11.png"><br>
    Additional technical details about the file are as follows:
    - File size: 1,768,280 bytes
    - SHA-256 hash:
@@ -72,5 +72,6 @@ Using Wireshark’s `Export Objects → HTTP`, the file named `86607.dat` was ex
 
 ## Conclusion
 The forensic analysis of the PCAP file successfully identified malicious network activity within a simulated Active Directory environment. Through Wireshark, suspicious HTTP traffic was isolated, and a malicious binary file (86607.dat) was recovered. Subsequent verification using VirusTotal confirmed that the file was a Trojan/Spyware sample associated with malware infection behavior.
+
 
 This investigation highlights the critical role of network forensic techniques in identifying indicators of compromise (IOCs), reconstructing malware communication patterns, and validating threats using external intelligence platforms such as VirusTotal. The integration of network analysis and threat intelligence significantly enhances the accuracy and reliability of digital forensic investigations in malware-related incidents.
